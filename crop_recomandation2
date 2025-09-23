@@ -1,576 +1,52 @@
-import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Separator } from '@/components/ui/separator';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Wheat, Users, Globe, Wifi, WifiOff, Lightbulb, Camera, IndianRupee, Leaf, Mic } from 'lucide-react';
-import { LanguageProvider, LanguageSelector, useLanguage } from '../components/LanguageSelector';
-import { CropRecommendationComponent } from '../components/CropRecommendation';
-import { WeatherWidget } from '../components/WeatherWidget';
-import { PlantDiseaseDetection } from '../components/PlantDiseaseDetection';
-import { NaturalRemedies } from '../components/NaturalRemedies';
-import { MarketPrices } from '../components/MarketPrices';
-import { VoiceAssistant } from '../components/VoiceAssistant';
-import { useOfflineStorage } from '../hooks/useOfflineStorage';
-import { CropRecommendationEngine } from '../lib/cropRecommendationEngine';
-
-const MainContent: React.FC = () => {
-  const { t } = useLanguage();
-  const { isOnline, storedRecommendations } = useOfflineStorage();
-  const [selectedState, setSelectedState] = useState('Telangana');
-  const [selectedCrop, setSelectedCrop] = useState('rice');
-  const [activeTab, setActiveTab] = useState('recommendations');
-
-  const seasonalTips = CropRecommendationEngine.getSeasonalTips('kharif', 'en');
-
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="bg-green-600 p-2 rounded-lg">
-                <Wheat className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">{t('appTitle')}</h1>
-                <p className="text-sm text-gray-600">Smart Agriculture for Indian Farmers</p>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                {isOnline ? (
-                  <Wifi className="h-4 w-4 text-green-600" />
-                ) : (
-                  <WifiOff className="h-4 w-4 text-orange-600" />
-                )}
-                <span className="text-sm text-muted-foreground">
-                  {isOnline ? 'Online' : 'Offline'}
-                </span>
-              </div>
-              <LanguageSelector />
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
-        <div className="mb-8">
-          <div className="text-center space-y-4">
-            <h2 className="text-3xl font-bold text-gray-900">{t('welcome')}</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Get personalized crop recommendations, detect plant diseases with camera, find natural remedies, 
-              and check market prices. Voice-enabled and available in Telugu, Hindi, and English.
-            </p>
-            
-            <div className="flex flex-wrap justify-center gap-2 mt-4">
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Users className="h-3 w-3" />
-                Farmer-Centric
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Globe className="h-3 w-3" />
-                Multi-Language
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <WifiOff className="h-3 w-3" />
-                Offline Ready
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Camera className="h-3 w-3" />
-                Camera Capture
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Mic className="h-3 w-3" />
-                Voice Assistant
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <Leaf className="h-3 w-3" />
-                Natural Remedies
-              </Badge>
-              <Badge variant="secondary" className="flex items-center gap-1">
-                <IndianRupee className="h-3 w-3" />
-                Market Prices
-              </Badge>
-            </div>
-          </div>
-        </div>
-
-        {/* Main Tabs */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-2 lg:grid-cols-5">
-            <TabsTrigger value="recommendations" className="flex items-center gap-2">
-              <Wheat className="h-4 w-4" />
-              <span className="hidden sm:inline">Crop Recommendations</span>
-              <span className="sm:hidden">Crops</span>
-            </TabsTrigger>
-            <TabsTrigger value="disease-detection" className="flex items-center gap-2">
-              <Camera className="h-4 w-4" />
-              <span className="hidden sm:inline">Disease Detection</span>
-              <span className="sm:hidden">Disease</span>
-            </TabsTrigger>
-            <TabsTrigger value="natural-remedies" className="flex items-center gap-2">
-              <Leaf className="h-4 w-4" />
-              <span className="hidden sm:inline">Natural Remedies</span>
-              <span className="sm:hidden">Remedies</span>
-            </TabsTrigger>
-            <TabsTrigger value="market-prices" className="flex items-center gap-2">
-              <IndianRupee className="h-4 w-4" />
-              <span className="hidden sm:inline">Market Prices</span>
-              <span className="sm:hidden">Prices</span>
-            </TabsTrigger>
-            <TabsTrigger value="weather" className="flex items-center gap-2">
-              <Lightbulb className="h-4 w-4" />
-              <span className="hidden sm:inline">Weather & Tips</span>
-              <span className="sm:hidden">Weather</span>
-            </TabsTrigger>
-          </TabsList>
-
-          {/* Crop Recommendations Tab */}
-          <TabsContent value="recommendations">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <CropRecommendationComponent />
-                
-                {/* Recent Recommendations */}
-                {storedRecommendations.length > 0 && (
-                  <Card className="mt-6">
-                    <CardHeader>
-                      <CardTitle>Recent Recommendations</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="space-y-3">
-                        {storedRecommendations.slice(0, 3).map((rec) => (
-                          <div key={rec.id} className="border rounded-lg p-3">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="text-sm font-medium">{rec.state}</div>
-                              <div className="text-xs text-muted-foreground">
-                                {new Date(rec.timestamp).toLocaleDateString()}
-                              </div>
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {rec.recommendations.length} crops recommended
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                )}
-              </div>
-
-              <div className="space-y-6">
-                <WeatherWidget state={selectedState} />
-                
-                {/* Voice Assistant Info */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Mic className="h-5 w-5 text-blue-500" />
-                      Voice Assistant
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="text-sm text-muted-foreground">
-                      Use voice commands to navigate the app. Click the microphone button in the bottom-right corner.
-                    </div>
-                    <div className="space-y-2 text-xs">
-                      <div className="font-medium">Try saying:</div>
-                      <div className="text-muted-foreground">"Crop recommendation"</div>
-                      <div className="text-muted-foreground">"Disease detection"</div>
-                      <div className="text-muted-foreground">"Market prices"</div>
-                      <div className="text-muted-foreground">"Capture photo"</div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                {/* Quick Features */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Key Features</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-green-100 p-1 rounded">
-                        <Wheat className="h-4 w-4 text-green-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">AI-Powered Recommendations</div>
-                        <div className="text-muted-foreground">Based on soil, weather, and regional data</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-blue-100 p-1 rounded">
-                        <Camera className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">Camera Disease Detection</div>
-                        <div className="text-muted-foreground">Capture photos for instant plant analysis</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-purple-100 p-1 rounded">
-                        <Mic className="h-4 w-4 text-purple-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">Voice Control</div>
-                        <div className="text-muted-foreground">Navigate using voice commands</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-orange-100 p-1 rounded">
-                        <WifiOff className="h-4 w-4 text-orange-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">Offline Functionality</div>
-                        <div className="text-muted-foreground">Works without internet connection</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Disease Detection Tab */}
-          <TabsContent value="disease-detection">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <PlantDiseaseDetection />
-              </div>
-              <div className="space-y-6">
-                <WeatherWidget state={selectedState} />
-                
-                <Card>
-                  <CardHeader>
-                    <CardTitle>How It Works</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-blue-100 p-1 rounded">
-                        <Camera className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">1. Capture or Upload</div>
-                        <div className="text-muted-foreground">Use camera to capture or upload existing photo</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-green-100 p-1 rounded">
-                        <Lightbulb className="h-4 w-4 text-green-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">2. AI Analysis</div>
-                        <div className="text-muted-foreground">Our AI identifies diseases and pests</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-purple-100 p-1 rounded">
-                        <Leaf className="h-4 w-4 text-purple-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">3. Get Solutions</div>
-                        <div className="text-muted-foreground">Receive treatment recommendations and pesticide links</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-start gap-3">
-                      <div className="bg-red-100 p-1 rounded">
-                        <Mic className="h-4 w-4 text-red-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">4. Voice Commands</div>
-                        <div className="text-muted-foreground">Say "capture photo" to take pictures hands-free</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Natural Remedies Tab */}
-          <TabsContent value="natural-remedies">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2">
-                <NaturalRemedies cropId={selectedCrop} />
-              </div>
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Select Crop for Remedies</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-2">
-                      {['rice', 'wheat', 'cotton', 'maize', 'sugarcane'].map((crop) => (
-                        <button
-                          key={crop}
-                          onClick={() => setSelectedCrop(crop)}
-                          className={`p-3 text-left rounded-lg border transition-colors ${
-                            selectedCrop === crop
-                              ? 'border-green-500 bg-green-50'
-                              : 'border-gray-200 hover:border-green-300'
-                          }`}
-                        >
-                          <div className="font-medium capitalize">{crop}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Benefits of Natural Remedies</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-3">
-                    <div className="flex items-start gap-3">
-                      <div className="bg-green-100 p-1 rounded">
-                        <Leaf className="h-4 w-4 text-green-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">Eco-Friendly</div>
-                        <div className="text-muted-foreground">Safe for environment and beneficial insects</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-blue-100 p-1 rounded">
-                        <IndianRupee className="h-4 w-4 text-blue-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">Cost-Effective</div>
-                        <div className="text-muted-foreground">Made from easily available ingredients</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-start gap-3">
-                      <div className="bg-purple-100 p-1 rounded">
-                        <Users className="h-4 w-4 text-purple-600" />
-                      </div>
-                      <div className="text-sm">
-                        <div className="font-medium">Safe for Farmers</div>
-                        <div className="text-muted-foreground">No harmful chemical exposure</div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-
-          {/* Market Prices Tab */}
-          <TabsContent value="market-prices">
-            <MarketPrices />
-          </TabsContent>
-
-          {/* Weather & Tips Tab */}
-          <TabsContent value="weather">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <WeatherWidget state={selectedState} />
-                
-                {/* Farming Tips */}
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Lightbulb className="h-5 w-5 text-yellow-500" />
-                      {t('tips')}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-3">
-                      {seasonalTips.map((tip, index) => (
-                        <div key={index} className="text-sm p-3 bg-yellow-50 rounded-lg border-l-4 border-yellow-400">
-                          {tip}
-                        </div>
-                      ))}
-                    </div>
-                    
-                    <Separator className="my-4" />
-                    
-                    <div className="text-sm p-3 bg-blue-50 rounded-lg border-l-4 border-blue-400">
-                      {t('soilTesting')}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="space-y-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Select State for Weather</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="grid gap-2 max-h-64 overflow-y-auto">
-                      {['Telangana', 'Andhra Pradesh', 'Karnataka', 'Tamil Nadu', 'Maharashtra', 'Gujarat', 'Punjab', 'Haryana'].map((state) => (
-                        <button
-                          key={state}
-                          onClick={() => setSelectedState(state)}
-                          className={`p-2 text-left rounded border transition-colors ${
-                            selectedState === state
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-blue-300'
-                          }`}
-                        >
-                          <div className="text-sm font-medium">{state}</div>
-                        </button>
-                      ))}
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </main>
-
-      {/* Voice Assistant */}
-      <VoiceAssistant
-        onSwitchTab={setActiveTab}
-        onCropRecommendation={() => setActiveTab('recommendations')}
-        onDiseaseDetection={() => setActiveTab('disease-detection')}
-        onNaturalRemedies={() => setActiveTab('natural-remedies')}
-        onMarketPrices={() => setActiveTab('market-prices')}
-        onWeather={() => setActiveTab('weather')}
-      />
-
-      {/* Footer */}
-      <footer className="bg-white border-t mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-sm text-gray-600">
-            <p>AI-Based Crop Recommendation System for Indian Farmers</p>
-            <p className="mt-2">Built for SIH25030 - Lightweight, Offline-Ready, and Government Scalable</p>
-            <p className="mt-2">Features: Crop Recommendations • Camera Disease Detection • Voice Assistant • Natural Remedies • Market Prices</p>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-};
-
-export default function Index() {
-  return (
-    <LanguageProvider>
-      <MainContent />
-    </LanguageProvider>
-  );
-}
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
-@layer base {
-  :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
-
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
-    --radius: 0.5rem;
-
-    --sidebar-background: 0 0% 98%;
-
-    --sidebar-foreground: 240 5.3% 26.1%;
-
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "default",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "tailwind.config.ts",
+    "css": "src/index.css",
+    "baseColor": "slate",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "aliases": {
+    "components": "@/components",
+    "utils": "@/lib/utils",
+    "ui": "@/components/ui",
+    "lib": "@/lib",
+    "hooks": "@/hooks"
   }
 }
+import js from "@eslint/js";
+import globals from "globals";
+import reactHooks from "eslint-plugin-react-hooks";
+import reactRefresh from "eslint-plugin-react-refresh";
+import tseslint from "typescript-eslint";
 
-@layer base {
-  * {
-    @apply border-border;
+export default tseslint.config(
+  { ignores: ["dist"] },
+  {
+    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    files: ["**/*.{ts,tsx}"],
+    languageOptions: {
+      ecmaVersion: 2020,
+      globals: globals.browser,
+    },
+    plugins: {
+      "react-hooks": reactHooks,
+      "react-refresh": reactRefresh,
+    },
+    rules: {
+      ...reactHooks.configs.recommended.rules,
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+      "@typescript-eslint/no-unused-vars": "off",
+    },
   }
-
-  body {
-    @apply bg-background text-foreground;
-  }
-}
-import { createRoot } from 'react-dom/client';
-import App from './App.tsx';
-import './index.css';
-
-createRoot(document.getElementById('root')!).render(<App />);
+);
 <!DOCTYPE html>
 <html lang="en">
 
@@ -596,71 +72,291 @@ createRoot(document.getElementById('root')!).render(<App />);
 
 </html>
 {
-  "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "default",
-  "rsc": false,
-  "tsx": true,
-  "tailwind": {
-    "config": "tailwind.config.ts",
-    "css": "src/index.css",
-    "baseColor": "slate",
-    "cssVariables": true,
-    "prefix": ""
+  "name": "shadcnui",
+  "type": "module",
+  "packageManager": "pnpm@8.10.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "lint": "eslint --quiet ./src",
+    "preview": "vite preview"
   },
-  "aliases": {
-    "components": "@/components",
-    "utils": "@/lib/utils",
-    "ui": "@/components/ui",
-    "lib": "@/lib",
-    "hooks": "@/hooks"
+  "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
+    "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-alert-dialog": "^1.1.1",
+    "@radix-ui/react-aspect-ratio": "^1.1.0",
+    "@radix-ui/react-avatar": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
+    "@radix-ui/react-collapsible": "^1.1.0",
+    "@radix-ui/react-context-menu": "^2.2.1",
+    "@radix-ui/react-dialog": "^1.1.2",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-menubar": "^1.1.1",
+    "@radix-ui/react-navigation-menu": "^1.2.0",
+    "@radix-ui/react-popover": "^1.1.1",
+    "@radix-ui/react-progress": "^1.1.0",
+    "@radix-ui/react-radio-group": "^1.2.0",
+    "@radix-ui/react-scroll-area": "^1.1.0",
+    "@radix-ui/react-select": "^2.1.1",
+    "@radix-ui/react-separator": "^1.1.0",
+    "@radix-ui/react-slider": "^1.2.0",
+    "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-switch": "^1.1.0",
+    "@radix-ui/react-tabs": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
+    "@radix-ui/react-toggle": "^1.1.0",
+    "@radix-ui/react-toggle-group": "^1.1.0",
+    "@radix-ui/react-tooltip": "^1.1.4",
+    "@supabase/supabase-js": "^2.50.3",
+    "@tanstack/react-query": "^5.83.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "cmdk": "^1.0.0",
+    "date-fns": "^3.6.0",
+    "embla-carousel-react": "^8.3.0",
+    "framer-motion": "^11.0.0",
+    "input-otp": "^1.2.4",
+    "lucide-react": "^0.462.0",
+    "next-themes": "^0.4.6",
+    "prismjs": "^1.29.0",
+    "react": "^19.1.1",
+    "react-day-picker": "^9.9.0",
+    "react-dom": "^19.1.1",
+    "react-dropzone": "^14.2.3",
+    "react-error-boundary": "^4.0.12",
+    "react-hook-form": "^7.53.0",
+    "react-resizable-panels": "^2.1.3",
+    "react-router-dom": "^6.26.2",
+    "recharts": "^2.12.7",
+    "sonner": "^1.5.0",
+    "tailwind-merge": "^2.5.2",
+    "tailwindcss-animate": "^1.0.7",
+    "uuid": "^10.0.0",
+    "vaul": "^1.1.2",
+    "zod": "^3.23.8",
+    "zustand": "^4.5.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.9.0",
+    "@metagptx/vite-plugin-source-locator": "latest",
+    "@tailwindcss/aspect-ratio": "^0.4.2",
+    "@tailwindcss/typography": "^0.5.15",
+    "@types/node": "^22.5.5",
+    "@types/react": "^19.1.11",
+    "@types/react-dom": "^19.1.8",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.9.0",
+    "eslint-plugin-react-hooks": "^5.1.0-rc.0",
+    "eslint-plugin-react-refresh": "^0.4.9",
+    "globals": "^15.9.0",
+    "lovable-tagger": "^1.1.7",
+    "postcss": "^8.4.47",
+    "tailwindcss": "^3.4.11",
+    "typescript": "^5.5.3",
+    "typescript-eslint": "^8.0.1",
+    "vite": "^5.4.1"
   }
 }
-import { Toaster } from '@/components/ui/sonner';
-import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Index from './pages/Index';
-import NotFound from './pages/NotFound';
+import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
+import tailwindcssAspectRatio from "@tailwindcss/aspect-ratio";
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
-
-export default App;
-import { Button } from '@/components/ui/button';
-
-export default function NotFoundPage() {
-  return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-gray-50 to-blue-50 p-6 text-center">
-      <div className="space-y-6 max-w-md">
-        <div className="space-y-3">
-          <h1 className="text-8xl font-bold text-blue-600">404</h1>
-          <h2 className="text-2xl font-semibold text-gray-800">Page Not Found</h2>
-          <p className="text-muted-foreground">The page you're looking for doesn't exist or may have been moved.</p>
-        </div>
-
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Button asChild>
-            <a href="/">Return Home</a>
-          </Button>
-          <Button variant="outline" onClick={() => window.history.back()}>
-            Go Back
-          </Button>
-        </div>
-      </div>
-    </div>
-  );
+export default {
+  darkMode: ["class"],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  prefix: "",
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
+  },
+  plugins: [tailwindcssAnimate, tailwindcssAspectRatio],
+} satisfies Config;
+{
+  "description": "- This is the DEFAULT template shadcn/ui, if the user's requirements do not specify a technology stack, development language, development tools, components, etc. This is a template for general web app, game, common application, tool development. - It includes a basic project structure with directories such as src/hooks, src/lib, and src/components. The src/components directory contains all the shadcn-ui components, with no additional installation commands required. If it's not necessary do not modify files outside the src directory.",
+  "required_fields": [],
+  "required_files": [
+    "README.md",
+    "src/App.tsx",
+    "src/main.tsx",
+    "src/pages/Index.tsx",
+    "index.html"
+  ],
+  "lang": "typescript",
+  "framework": "react",
+  "name": "shadcn/ui",
+  "scene": "default_web_project"
 }
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+    "jsx": "react-jsx",
+
+    /* Linting */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false,
+    "noFallthroughCasesInSwitch": false,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+}
+{
+  "files": [],
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "noImplicitAny": false,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "allowJs": true,
+    "noUnusedLocals": false,
+    "strictNullChecks": false
+  }
+}
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true
+  },
+  "include": ["vite.config.ts"]
+}
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react-swc";
+import path from "path";
+import { viteSourceLocator } from "@metagptx/vite-plugin-source-locator";
+
+// https://vitejs.dev/config/
+export default defineConfig(({ mode }) => ({
+  plugins: [
+    viteSourceLocator({
+      prefix: "mgx",
+    }),
+    react(),
+  ],
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src"),
+    },
+  },
+}));
 
